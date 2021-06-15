@@ -17,4 +17,21 @@ a {
 
 .panel__top {
   bottom: 0;
+  width: 100%;
+  padding: 0 !important;
+}
+
+.panel__basic-actions {
+  width: 100%;
+  position: relative !important;
+  display: flex;
+  justify-content: center;
+}
+
+.gjs-pn-buttons {
+  justify-content: center !important;
+}
+
+#gjs {
+  height: 100vh !important;
 }
