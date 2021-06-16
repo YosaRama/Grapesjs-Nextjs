@@ -27,6 +27,15 @@ const handler = nc()
     } catch (e) {
       console.log("error");
     }
+  })
+  .delete(async (req, res) => {
+    const pageId = req.body.id;
+    try {
+      const result = await Query("DELETE FROM pages WHERE id=?", [pageId]);
+      res.status(200).json({ message: "Success Delete" });
+    } catch (e) {
+      throw new Error(e);
+    }
   });
 
 export default handler;

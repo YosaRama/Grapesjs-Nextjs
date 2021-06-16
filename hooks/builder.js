@@ -19,10 +19,24 @@ export const useBuilder = () => {
     }
   });
 
+  const onDelete = useCallback(async (Id) => {
+    try {
+      const { data: res } = await api.delete("/builder", { data: { id: Id } });
+      if (res) {
+        mutate(pathName);
+      } else {
+        console.log(error);
+      }
+    } catch (err) {
+      throw new Error(err);
+    }
+  });
+
   return {
     data,
     error,
     onAdd,
+    onDelete,
   };
 };
 
@@ -32,7 +46,7 @@ export const useSinglePage = (title) => {
 
   const onEdit = useCallback(async (data) => {
     try {
-      const { data: res } = api.put(pathName, data);
+      const { data: res } = await api.put(pathName, data);
       if (res) {
         mutate(pathName);
       } else {

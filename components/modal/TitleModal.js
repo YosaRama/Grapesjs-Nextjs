@@ -2,8 +2,10 @@ import s from "./TitleModal.module.css";
 import { useContext, useRef } from "react";
 import BuilderContext from "../../store/builderContext";
 import { useBuilder } from "../../hooks/builder";
+import { useRouter } from "next/router";
 
 function TitleModal() {
+  const router = useRouter();
   const builderCtx = useContext(BuilderContext);
   const { onAdd } = useBuilder();
   const currentTitle = useRef();
@@ -16,6 +18,7 @@ function TitleModal() {
       styles: builderCtx.styles,
     });
     builderCtx.closeModal();
+    router.push("/");
   }
 
   return (

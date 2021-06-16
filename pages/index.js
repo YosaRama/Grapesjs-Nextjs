@@ -1,14 +1,11 @@
-import { useBuilder, useSinglePage } from "../hooks/builder";
-import { Fragment, useEffect, useState } from "react";
+import { useBuilder } from "../hooks/builder";
+import { Fragment } from "react";
 import { useRouter } from "next/router";
-import { useContext } from "react";
-import BuilderContext from "../store/builderContext";
 
 function Dashboard() {
   const router = useRouter();
-  const { data: pagesListing, error } = useBuilder();
+  const { data: pagesListing, error, onDelete } = useBuilder();
   const pagesList = pagesListing?.data?.result;
-  const builderCtx = useContext(BuilderContext);
 
   const handlerPreview = (permalink) => {
     router.push("/" + permalink);
@@ -16,6 +13,14 @@ function Dashboard() {
 
   const handleEdit = (currentTitle) => {
     router.push("/builder/" + currentTitle);
+  };
+
+  const handleDelete = (currentId) => {
+    onDelete(currentId);
+  };
+
+  const handleCreate = () => {
+    router.push("/builder");
   };
 
   return (
@@ -33,10 +38,16 @@ function Dashboard() {
                   <button onClick={() => handleEdit(page.title)}>
                     Edit page
                   </button>
+                  <button onClick={() => handleDelete(page.id)}>
+                    Delete page
+                  </button>
                 </div>
               </div>
             );
           })}
+          <div style={{ marginTop: "50px" }}>
+            <button onClick={() => handleCreate()}>Create New Page</button>
+          </div>
         </div>
       )}
     </Fragment>
