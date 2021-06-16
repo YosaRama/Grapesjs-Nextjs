@@ -1,7 +1,7 @@
 import s from "./TitleModal.module.css";
 import { useContext, useRef } from "react";
 import BuilderContext from "../../store/builderContext";
-import useBuilder from "../../hooks/builder";
+import { useBuilder } from "../../hooks/builder";
 
 function TitleModal() {
   const builderCtx = useContext(BuilderContext);
