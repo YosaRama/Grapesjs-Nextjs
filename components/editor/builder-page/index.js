@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "grapesjs/dist/css/grapes.min.css";
 import { useContext } from "react";
 import BuilderContext from "../../../store/builderContext";
-import { loadSavePanels } from "../panels/save-panels";
+import loadSavePanels from "../panels/save-panels";
 
 function Editor() {
   const [builder, setBuilder] = useState(null);

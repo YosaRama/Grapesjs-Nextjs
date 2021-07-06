@@ -1,3 +1,5 @@
+@import "~antd/dist/antd.css";
+
 html,
 body {
   padding: 0;
@@ -34,4 +36,13 @@ a {
 
 #gjs {
   height: 100vh !important;
+}
+
+.logo {
+  height: 28px;
+  margin: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
 }
