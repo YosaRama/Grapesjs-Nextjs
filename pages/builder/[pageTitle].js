@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import GrapesHandle from "../../config/singleGrapes";
+import GrapesHandle from "../../components/editor/edit-page/index";
 import { useContext } from "react";
 import BuilderContext from "../../store/builderContext";
 
