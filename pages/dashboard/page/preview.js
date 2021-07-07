@@ -1,8 +1,4 @@
-import { Fragment } from "react";
-import { useRouter } from "next/router";
-
 function Page(props) {
-  const router = useRouter();
   const html = String(props.data.data.content);
   const styles = String(props.data.data.styles);
 
@@ -14,9 +10,9 @@ function Page(props) {
   );
 }
 
-export const getServerSideProps = async (context) => {
+export const getServerSideProps = async ({ query }) => {
   const result = await fetch(
-    `http://localhost:3000/api/builder/${context.params.pages}`
+    `http://localhost:3000/api/builder/${query.pageId}`
   );
   const data = await result.json();
   return {

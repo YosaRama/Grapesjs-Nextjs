@@ -24,8 +24,8 @@ const PageSider = (props) => {
         <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
           <div className="logo">Y-BUILDER</div>
           <Menu theme="dark" mode="inline" selectedKeys={Router.pathname}>
-            <Menu.Item key="/dashboard" icon={<CopyOutlined />}>
-              <Link href="/dashboard">Pages</Link>
+            <Menu.Item key="/dashboard/page" icon={<CopyOutlined />}>
+              <Link href="/dashboard/page">Pages</Link>
             </Menu.Item>
             <Menu.Item key="/dashboard/asset-manager" icon={<CameraOutlined />}>
               <Link href="/dashboard/asset-manager">Asset Manager</Link>

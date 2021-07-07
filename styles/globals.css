@@ -46,3 +46,8 @@ a {
   justify-content: center;
   color: #fff;
 }
+
+.action-icon:hover {
+  cursor: pointer;
+  color: #1890ff;
+}

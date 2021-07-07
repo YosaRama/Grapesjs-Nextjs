@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import "grapesjs/dist/css/grapes.min.css";
 import { useSinglePage } from "../../../hooks/builder";
 import { useRouter } from "next/router";
 import loadUpdatePanels from "../panels/update-panels";
 
-function Editor() {
+function Editor(props) {
   const router = useRouter();
   const [builder, setBuilder] = useState(null);
-  const pageTitle = router.query.pageTitle;
-  const { data: pageData, onEdit } = useSinglePage(pageTitle);
+  const pageId = router.query.pageId;
+  const { data: pageData, onEdit } = useSinglePage(pageId);
   const pageContent = pageData?.data?.data?.content;
   const pageStyles = pageData?.data?.data?.styles;
 
@@ -27,12 +27,13 @@ function Editor() {
       });
 
       // Update Panel
+      const panelManager = editor.Panels;
       const commandUpdate = function command(editor) {
         onEdit({
           content: editor.getHtml(),
           styles: editor.getCss(),
         });
-        router.replace("/");
+        router.replace("/dashboard");
         panelManager.removePanel({
           id: "basic-actions",
         });
@@ -47,6 +48,16 @@ function Editor() {
       setBuilder(editor);
     }
   }, [pageContent, pageStyles]);
+
+  return (
+    <Fragment>
+      <div className="panel__top">
+        <div className="panel__basic-actions"></div>
+      </div>
+      <div id="single-gjs" />
+      <div id="blocks" />
+    </Fragment>
+  );
 }
 
 export default Editor;
