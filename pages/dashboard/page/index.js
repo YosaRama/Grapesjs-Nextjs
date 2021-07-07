@@ -16,11 +16,11 @@ function Dashboard() {
   const { confirm } = Modal;
 
   const handlerPreview = (permalink) => {
-    router.push("/dashboard/page/preview?pageId=" + permalink);
+    router.push("/dashboard/page/preview?id=" + permalink);
   };
 
   const handleEdit = (currentTitle) => {
-    router.push("/dashboard/page/edit?pageId=" + currentTitle);
+    router.push("/dashboard/page/edit?id=" + currentTitle);
   };
 
   const handleDelete = (currentId) => {

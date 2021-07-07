@@ -7,8 +7,8 @@ import loadUpdatePanels from "../panels/update-panels";
 function Editor(props) {
   const router = useRouter();
   const [builder, setBuilder] = useState(null);
-  const pageId = router.query.pageId;
-  const { data: pageData, onEdit } = useSinglePage(pageId);
+  const id = router.query.id;
+  const { data: pageData, onEdit } = useSinglePage(id);
   const pageContent = pageData?.data?.data?.content;
   const pageStyles = pageData?.data?.data?.styles;
 

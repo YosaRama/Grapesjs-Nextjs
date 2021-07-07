@@ -11,9 +11,7 @@ function Page(props) {
 }
 
 export const getServerSideProps = async ({ query }) => {
-  const result = await fetch(
-    `http://localhost:3000/api/builder/${query.pageId}`
-  );
+  const result = await fetch(`http://localhost:3000/api/builder/${query.id}`);
   const data = await result.json();
   return {
     props: {
