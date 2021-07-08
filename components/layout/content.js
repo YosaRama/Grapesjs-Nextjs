@@ -17,7 +17,7 @@ function PageContent(props) {
     <Content style={{ margin: "0 16px" }}>
       <Breadcrumb style={{ margin: "16px 0" }}>
         {paths.map((path) => (
-          <Breadcrumb.Item>{path}</Breadcrumb.Item>
+          <Breadcrumb.Item key={path}>{path}</Breadcrumb.Item>
         ))}
       </Breadcrumb>
       <div

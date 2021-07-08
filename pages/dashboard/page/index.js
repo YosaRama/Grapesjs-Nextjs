@@ -96,12 +96,12 @@ function Dashboard() {
   ];
 
   return (
-    <Layout>
+    <>
       <Button onClick={() => handleCreate()} style={{ marginBottom: 20 }}>
         Create New Page
       </Button>
       <Table dataSource={pagesList} columns={columns} />
-    </Layout>
+    </>
   );
 }
 

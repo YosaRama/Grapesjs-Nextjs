@@ -1,10 +1,11 @@
 import Layout from "../../../components/layout/layout";
+import { Fragment } from "react";
 
 function AssetManager() {
   return (
-    <Layout>
+    <>
       <h1>Asset Manager</h1>
-    </Layout>
+    </>
   );
 }
 
