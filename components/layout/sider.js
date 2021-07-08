@@ -27,8 +27,8 @@ const PageSider = (props) => {
             <Menu.Item key="/dashboard/page" icon={<CopyOutlined />}>
               <Link href="/dashboard/page">Pages</Link>
             </Menu.Item>
-            <Menu.Item key="/dashboard/asset-manager" icon={<CameraOutlined />}>
-              <Link href="/dashboard/asset-manager">Asset Manager</Link>
+            <Menu.Item key="/dashboard/media" icon={<CameraOutlined />}>
+              <Link href="/dashboard/media">Media</Link>
             </Menu.Item>
           </Menu>
         </Sider>
