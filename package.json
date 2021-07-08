@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "antd": "^4.16.6",
+    "antd-img-crop": "^3.14.2",
     "axios": "^0.21.1",
     "grapesjs": "^0.17.4",
     "grapesjs-preset-webpage": "^0.1.11",

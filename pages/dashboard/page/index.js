@@ -2,7 +2,7 @@ import { useBuilder } from "../../../hooks/builder";
 import { Fragment } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../../components/layout/layout";
-import { Table, Row, Col, Button, Tooltip, Modal } from "antd";
+import { Table, Row, Col, Button, Tooltip, Modal, Card } from "antd";
 import {
   DeleteOutlined,
   ExpandAltOutlined,
@@ -96,12 +96,16 @@ function Dashboard() {
   ];
 
   return (
-    <>
-      <Button onClick={() => handleCreate()} style={{ marginBottom: 20 }}>
-        Create New Page
-      </Button>
-      <Table dataSource={pagesList} columns={columns} />
-    </>
+    <Card
+      title="Page Builder"
+      extra={
+        <Button onClick={() => handleCreate()} style={{ marginBottom: 0 }}>
+          Create New Page
+        </Button>
+      }
+    >
+      <Table dataSource={pagesList} columns={columns} bordered />
+    </Card>
   );
 }
 
