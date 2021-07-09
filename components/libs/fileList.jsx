@@ -1,8 +1,10 @@
 import { Fragment, useState } from "react";
 import { Upload } from "antd";
 import ImgCrop from "antd-img-crop";
+import { useMediaLibraries } from "../../hooks/media";
 
 function FileList() {
+  const { data: listFile, error, onAdd } = useMediaLibraries();
   const [fileList, setFileList] = useState([
     {
       uid: "-1",
@@ -12,13 +14,13 @@ function FileList() {
     },
   ]);
 
-  const onChange = ({ fileList: newFileList }) => {
+  const onChange = ({ fileList: newFileList, file: sendFile }) => {
     setFileList(newFileList);
+    // TODO : Add upload file system right here
   };
 
   const onPreview = async (file) => {
     let src = file.url;
-    console.log(file);
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -33,16 +35,14 @@ function FileList() {
   };
 
   return (
-    <ImgCrop rotate>
-      <Upload
-        listType="picture-card"
-        fileList={fileList}
-        onChange={onChange}
-        onPreview={onPreview}
-      >
-        {"+ Upload"}
-      </Upload>
-    </ImgCrop>
+    <Upload
+      listType="picture-card"
+      fileList={fileList}
+      onChange={onChange}
+      onPreview={onPreview}
+    >
+      {"+ Upload"}
+    </Upload>
   );
 }
 
