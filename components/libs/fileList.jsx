@@ -1,22 +1,22 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Upload } from "antd";
 import ImgCrop from "antd-img-crop";
 import { useMediaLibraries } from "../../hooks/media";
+import Form from "antd/lib/form/Form";
+import axios from "axios";
 
 function FileList() {
-  const { data: listFile, error, onAdd } = useMediaLibraries();
-  const [fileList, setFileList] = useState([
-    {
-      uid: "-1",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-  ]);
+  const { data: listsFile, error } = useMediaLibraries();
+  const listFile = listsFile?.data?.data;
 
-  const onChange = ({ fileList: newFileList, file: sendFile }) => {
+  useEffect(() => {
+    setFileList(listFile);
+  }, [listsFile]);
+
+  const [fileList, setFileList] = useState([]);
+
+  const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
-    // TODO : Add upload file system right here
   };
 
   const onPreview = async (file) => {
@@ -35,14 +35,21 @@ function FileList() {
   };
 
   return (
-    <Upload
-      listType="picture-card"
-      fileList={fileList}
-      onChange={onChange}
-      onPreview={onPreview}
-    >
-      {"+ Upload"}
-    </Upload>
+    <>
+      {listFile && (
+        <Upload
+          name="theFiles"
+          listType="picture-card"
+          fileList={fileList}
+          onChange={onChange}
+          onPreview={onPreview}
+          multiple={false}
+          action="/api/media"
+        >
+          {"+ Upload"}
+        </Upload>
+      )}
+    </>
   );
 }
 
