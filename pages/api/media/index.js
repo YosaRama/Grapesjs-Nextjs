@@ -1,14 +1,6 @@
 import nextConnect from "next-connect";
-import multer from "multer";
 import { Query } from "../../../db";
-
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: "./public/images",
-    filename: (req, file, cb) =>
-      cb(null, file.originalname.split(" ").join("_")),
-  }),
-});
+import fs from "fs";
 
 const apiRoute = nextConnect({
   onError(error, req, res) {
@@ -30,25 +22,16 @@ apiRoute.get(async (req, res) => {
   }
 });
 
-apiRoute.post(upload.single("theFiles"), async (req, res) => {
-  const fileName = req.file.filename;
-  const fileType = req.file.mimetype;
-  const filePath = req.file.path.replace("public", "");
+apiRoute.delete(async (req, res) => {
+  const fileId = req.body.uid;
+  const fileUrl = "./public/" + req.body.url;
   try {
-    const result = await Query(
-      "INSERT INTO media (url, type, name) VALUES (?,?,?)",
-      [filePath, fileType, fileName]
-    );
-    res.status(200).json({ data: "Success save file" });
+    fs.unlinkSync(fileUrl);
+    const result = await Query("DELETE FROM media WHERE uid=?", [fileId]);
+    res.status(200).json({ message: "Success Delete" });
   } catch (error) {
-    throw new Error(error);
+    console.log(error);
   }
 });
 
 export default apiRoute;
-
-export const config = {
-  api: {
-    bodyParser: false, // Disallow body parsing, consume as stream
-  },
-};

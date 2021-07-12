@@ -1,35 +1,21 @@
 import { Upload, message } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
+import { useMediaLibraries } from "../../hooks/media";
 
 function UploadFile() {
   const { Dragger } = Upload;
+  const { onAdd, status } = useMediaLibraries();
 
   const props = {
-    name: "file",
-    multiple: true,
-    onChange(info) {
-      const { status } = info.file;
-      console.log(info);
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
-      if (status === "done") {
-        message.success(`${info.file.name} file uploaded successfully.`);
-      } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
-      }
+    name: "theFiles",
+    customRequest(info) {
+      message.success(`${info.file.name} file uploaded successfully.`);
+      onAdd({ file: info.file });
     },
-    onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
-    },
-    showUploadList: {
-      showPreviewIcon: true,
-      showRemoveIcon: true,
-      showDownloadIcon: true,
-      removeIcon: true,
-      downloadIcon: true,
-    },
+    multiple: false,
+    showUploadList: false,
   };
+
   return (
     <div style={{ height: 450 }}>
       <Dragger {...props}>
