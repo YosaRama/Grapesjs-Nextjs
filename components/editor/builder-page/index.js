@@ -40,14 +40,7 @@ function Editor() {
         content: "<div><h1>Yosa Rama</h1></div>",
       });
 
-      // This is our custom script (avoid using arrow functions)
-      const script = function () {
-        return (
-          <div>
-            <h1>Yosa rama</h1>
-          </div>
-        );
-      };
+      const script = function () {};
 
       // Define a new custom component
       editor.Components.addType("comp-with-js", {
@@ -59,15 +52,10 @@ function Editor() {
               width: "100px",
               height: "100px",
             },
+            content: "<div><h1>Yosa Rama Dinata</h1></div>",
           },
         },
       });
-
-      editor.addComponents(`<div>
-      <span data-gjs-type="custom-component" data-gjs-prop="someValue" title="foo">
-        Hello!
-      </span>
-    </div>`);
 
       // Create a block for the component, so we can drop it easily
       editor.Blocks.add("test-block", {

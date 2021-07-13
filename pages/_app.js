@@ -11,15 +11,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <SWRConfig value={{ refreshInterval: 3000, fetcher }}>
       <BuilderContextProvider>
-        {router.pathname === "/dashboard/page/create" ||
-        router.pathname === "/dashboard/page/edit" ||
-        router.pathname === "/dashboard/page/preview" ? (
-          <Component {...pageProps} />
-        ) : (
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        )}
+        <Component {...pageProps} />
       </BuilderContextProvider>
     </SWRConfig>
   );

@@ -14,13 +14,13 @@ const PageSider = (props) => {
     setCollapsed(collapsed);
   };
 
-  useLayoutEffect(() => {
-    setSideshow(true);
-  });
+  // useLayoutEffect(() => {
+  //   setSideshow(true);
+  // });
 
   return (
     <>
-      {sideshow && (
+      {/* {sideshow && (
         <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
           <div className="logo">Y-BUILDER</div>
           <Menu theme="dark" mode="inline" selectedKeys={Router.pathname}>
@@ -32,7 +32,18 @@ const PageSider = (props) => {
             </Menu.Item>
           </Menu>
         </Sider>
-      )}
+      )} */}
+      <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
+        <div className="logo">Y-BUILDER</div>
+        <Menu theme="dark" mode="inline" selectedKeys={Router.pathname}>
+          <Menu.Item key="/dashboard/page" icon={<CopyOutlined />}>
+            <Link href="/dashboard/page">Pages</Link>
+          </Menu.Item>
+          <Menu.Item key="/dashboard/media" icon={<CameraOutlined />}>
+            <Link href="/dashboard/media">Media</Link>
+          </Menu.Item>
+        </Menu>
+      </Sider>
     </>
   );
 };
