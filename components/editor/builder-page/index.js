@@ -3,10 +3,18 @@ import "grapesjs/dist/css/grapes.min.css";
 import { useContext } from "react";
 import BuilderContext from "../../../store/builderContext";
 import loadSavePanels from "../panels/save-panels";
+import ImageBlock from "../blocks/image-block";
+import { useMediaCtx } from "../../../store/mediaContext";
+import { loadGetInitialProps } from "next/dist/next-server/lib/utils";
 
 function Editor() {
   const [builder, setBuilder] = useState(null);
   const builderCtx = useContext(BuilderContext);
+  const [setting, setSetting] = useState(
+    "https://www.google.co.id/images/branding/googlelogo/2x/googlelogo_color_160x56dp.png"
+  );
+  const { showModal, modal } = useMediaCtx();
+  console.log(modal);
 
   useEffect(() => {
     if (!builder) {
@@ -21,6 +29,9 @@ function Editor() {
         },
       });
 
+      // Set Page blank
+      editor.setComponents("");
+
       // Save Panels
       const commandSave = function command(editor) {
         builderCtx.showModal();
@@ -30,45 +41,12 @@ function Editor() {
 
       loadSavePanels(editor, commandSave);
 
-      const blockManager = editor.BlockManager;
-
-      blockManager.add("some-block-id", {
-        label: `<div>
-            <img src="https://picsum.photos/70/70"/>
-            <div class="my-label-block">Label block</div>
-          </div>`,
-        content: "<div><h1>Yosa Rama</h1></div>",
-      });
-
-      const script = function () {};
-
-      // Define a new custom component
-      editor.Components.addType("comp-with-js", {
-        model: {
-          defaults: {
-            script,
-            // Add some style, just to make the component visible
-            style: {
-              width: "100px",
-              height: "100px",
-            },
-            content: "<div><h1>Yosa Rama Dinata</h1></div>",
-          },
-        },
-      });
-
-      // Create a block for the component, so we can drop it easily
-      editor.Blocks.add("test-block", {
-        label: "Test block",
-        attributes: { class: "fa fa-text" },
-        content: { type: "comp-with-js" },
-      });
-
-      editor.setComponents("");
+      // Load Image block
+      ImageBlock(editor, showModal);
 
       setBuilder(editor);
     }
-  });
+  }, [setting]);
 
   return (
     <>
@@ -77,6 +55,14 @@ function Editor() {
       </div>
       <div id="gjs" />
       <div id="blocks" />
+      <button
+        onClick={() => {
+          showModal();
+          console.log(modal);
+        }}
+      >
+        Change modal
+      </button>
     </>
   );
 }
