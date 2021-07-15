@@ -5,16 +5,13 @@ import BuilderContext from "../../../store/builderContext";
 import loadSavePanels from "../panels/save-panels";
 import ImageBlock from "../blocks/image-block";
 import { useMediaCtx } from "../../../store/mediaContext";
-import { loadGetInitialProps } from "next/dist/next-server/lib/utils";
+import { Modal } from "antd";
 
 function Editor() {
   const [builder, setBuilder] = useState(null);
   const builderCtx = useContext(BuilderContext);
-  const [setting, setSetting] = useState(
-    "https://www.google.co.id/images/branding/googlelogo/2x/googlelogo_color_160x56dp.png"
-  );
-  const { showModal, modal } = useMediaCtx();
-  console.log(modal);
+  const { showModal, modal, imageSrc, setImageSrc } = useMediaCtx();
+  const [selectedImage, setSelectedImage] = useState();
 
   useEffect(() => {
     if (!builder) {
@@ -42,11 +39,22 @@ function Editor() {
       loadSavePanels(editor, commandSave);
 
       // Load Image block
-      ImageBlock(editor, showModal);
+      ImageBlock(editor, showModal, imageSrc);
+
+      editor.on(`block:drag:stop`, (target) => {
+        console.log(`imageSrc`, selectedImage);
+        setSelectedImage(
+          "http://localhost:3000/images/chad-montano-MqT0asuoIcU-unsplash.jpg"
+        );
+      });
+
+      editor.on(`component:selected`, (target) => {
+        target.setAttributes({ src: imageSrc });
+      });
 
       setBuilder(editor);
     }
-  }, [setting]);
+  }, [selectedImage]);
 
   return (
     <>
@@ -55,13 +63,15 @@ function Editor() {
       </div>
       <div id="gjs" />
       <div id="blocks" />
+      <Modal visible={modal}>
+        <h1>This is Media Library</h1>
+      </Modal>
       <button
         onClick={() => {
-          showModal();
-          console.log(modal);
+          test();
         }}
       >
-        Change modal
+        change image
       </button>
     </>
   );

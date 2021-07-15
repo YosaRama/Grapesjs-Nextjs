@@ -20,8 +20,8 @@ export function MediaContextProvider(props) {
     setModalShow(false);
   }
 
-  function imageSrcHandler(imageSrc) {
-    setImageSrc(imageSrc);
+  function imageSrcHandler(imgSelect) {
+    setImageSrc(imgSelect);
   }
 
   const context = {

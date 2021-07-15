@@ -1,9 +1,6 @@
-function ImageBlock(editor, setting) {
+function ImageBlock(editor) {
   const blockManager = editor.Blocks;
   const componentManager = editor.Components;
-
-  console.log(setting);
-  const script1 = setting;
 
   componentManager.addType("next-image", {
     model: {
@@ -14,11 +11,8 @@ function ImageBlock(editor, setting) {
         },
         tagName: "img",
         attributes: {
-          src: "http://localhost:3000/images/chad-montano-MqT0asuoIcU-unsplash.jpg",
+          src: "",
         },
-        script: script1,
-        myProps1: setting,
-        "script-props": ["myProps1"],
       },
     },
   });
