@@ -12,6 +12,7 @@ function ImageBlock(editor) {
         tagName: "img",
         attributes: {
           src: "",
+          id: "",
         },
       },
     },
