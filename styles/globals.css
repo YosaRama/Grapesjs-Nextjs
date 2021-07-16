@@ -51,3 +51,11 @@ a {
   cursor: pointer;
   color: #1890ff;
 }
+
+.ant-upload-picture-card-wrapper
+  .ant-upload-list-item-actions
+  .ant-btn
+  .anticon-check {
+  color: #fff;
+  font-size: 24px;
+}

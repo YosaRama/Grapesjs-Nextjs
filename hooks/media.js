@@ -39,7 +39,7 @@ export const useMediaLibraries = () => {
       try {
         setLoading(true);
         const { data: res } = await api.delete(pathName, {
-          data: { uid: Id, url: Url },
+          data: { id: Id, url: Url },
         });
         if (res) {
           mutate(pathName);

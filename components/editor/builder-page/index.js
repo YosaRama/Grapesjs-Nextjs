@@ -10,6 +10,7 @@ import FileList from "../../libs/fileList";
 
 function Editor() {
   const [builder, setBuilder] = useState(null);
+  const [tempWidget, setTempWidget] = useState(null);
   const builderCtx = useContext(BuilderContext);
   const { showModal, modal, imageSrc, setImageSrc, closeModal } = useMediaCtx();
 
@@ -38,19 +39,26 @@ function Editor() {
 
       loadSavePanels(editor, commandSave);
 
-      // Load Image block
-      ImageBlock(editor, showModal, imageSrc);
-
-      editor.on(`block:drag:stop`, (target) => {
-        showModal();
-        target.setAttributes({
-          src: "http://localhost:3000/images/chad-montano-MqT0asuoIcU-unsplash.jpg",
-        });
-      });
-
       setBuilder(editor);
     }
-  }, []);
+
+    ImageBlock(editor, imageSrc);
+
+    // Load Image block
+    editor.on(`block:drag:stop`, (target) => {
+      if (target && target.attributes.type === "next-image") {
+        showModal();
+        setTempWidget(target);
+      }
+    });
+  }, [imageSrc]);
+
+  function handleChangeImage() {
+    console.log(builder);
+    tempWidget.setAttributes({
+      src: imageSrc,
+    });
+  }
 
   return (
     <>
@@ -59,7 +67,12 @@ function Editor() {
       </div>
       <div id="gjs" />
       <div id="blocks" />
-      <Modal visible={modal} title="Media Library" onCancel={closeModal}>
+      <Modal
+        visible={modal}
+        title="Media Library"
+        onCancel={closeModal}
+        onOk={() => handleChangeImage}
+      >
         <FileList />
       </Modal>
     </>

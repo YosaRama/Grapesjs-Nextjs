@@ -1,4 +1,4 @@
-function ImageBlock(editor) {
+function ImageBlock(editor, imageSrc) {
   const blockManager = editor.Blocks;
   const componentManager = editor.Components;
 
@@ -14,6 +14,7 @@ function ImageBlock(editor) {
           src: "",
           id: "",
         },
+        testprop: imageSrc,
       },
     },
   });

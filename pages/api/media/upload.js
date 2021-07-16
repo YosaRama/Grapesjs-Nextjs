@@ -29,8 +29,8 @@ apiRoute.post(upload.single("theFiles"), async (req, res) => {
   const filePath = req.file.path.replace("public", "");
   try {
     const result = await Query(
-      "INSERT INTO media (url, type, name) VALUES (?,?,?)",
-      [filePath, fileType, fileName]
+      "INSERT INTO media (filename, mimetype, url) VALUES (?,?,?)",
+      [fileName, fileType, filePath]
     );
     res.status(200).json({ data: "Success save file" });
   } catch (error) {
