@@ -2,7 +2,7 @@ import mysql from "serverless-mysql";
 
 export const db = mysql({
   config: {
-    host: process.env.MYSQL_HOST,
+    host: process.env.MYSQL_ENDPOINT,
     database: process.env.MYSQL_DATABASE,
     port: +process.env.MYSQL_PORT,
     user: process.env.MYSQL_USERNAME,
