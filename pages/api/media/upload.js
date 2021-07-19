@@ -1,15 +1,40 @@
 import nextConnect from "next-connect";
 import multer from "multer";
+import multerS3 from "multer-s3";
+import aws from "aws-sdk";
+import fs from "fs";
 import { Query } from "../../../db";
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: "./public/images",
-    filename: (req, file, cb) =>
-      cb(null, file.originalname.split(" ").join("_")),
+aws.config.update({
+  accessKeyId: "AKIA2K262P2TEIJQWUEP",
+  secretAccessKey: "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",
+});
+
+const s3 = new aws.S3();
+
+const bucketName = "yosarama-pagebuilder";
+
+// * Upload to S3
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: bucketName,
+    key: function (req, file, cb) {
+      cb(null, file.originalname);
+    },
   }),
 });
 
+// * Upload to local storage
+// const upload = multer({
+//   storage: multer.diskStorage({
+//     destination: "./public/images",
+//     filename: (req, file, cb) =>
+//       cb(null, file.originalname.split(" ").join("_")),
+//   }),
+// });
+
+//* Error handling for API system
 // const apiRoute = nextConnect({
 //   onError(error, req, res) {
 //     res
@@ -24,14 +49,14 @@ const upload = multer({
 const apiRoute = nextConnect();
 
 apiRoute.post(upload.single("theFiles"), async (req, res) => {
-  const fileName = req.file.filename;
+  const fileName = req.file.originalname;
   const fileType = req.file.mimetype;
-  const filePath = req.file.path.replace("public", "");
+  const filePath = req.file.location;
   try {
-    const result = await Query(
-      "INSERT INTO media (filename, mimetype, url) VALUES (?,?,?)",
-      [fileName, fileType, filePath]
-    );
+    // const result = await Query(
+    //   "INSERT INTO media (filename, mimetype, url) VALUES (?,?,?)",
+    //   [fileName, fileType, filePath]
+    // );
     res.status(200).json({ data: "Success save file" });
   } catch (error) {
     throw new Error(error);
