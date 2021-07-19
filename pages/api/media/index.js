@@ -34,4 +34,23 @@ apiRoute.delete(async (req, res) => {
   }
 });
 
+apiRoute.put(async (req, res) => {
+  const id = req.body.id;
+  const fileTitle = req.body.title || null;
+  const fileAlt = req.body.alt || null;
+  const fileDesc = req.body.description || null;
+  const updateAt = fileTitle || fileAlt || fileDesc ? new Date() : null;
+
+  try {
+    // console.log(id, fileTitle, fileAlt, fileDesc, updateAt);
+    const result = await Query(
+      "UPDATE media SET title=?,alt_text=?,description=?,updated_at=? WHERE id=?",
+      [fileTitle, fileAlt, fileDesc, updateAt, id]
+    );
+    res.status(200).json({ message: "Success update file" });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
 export default apiRoute;

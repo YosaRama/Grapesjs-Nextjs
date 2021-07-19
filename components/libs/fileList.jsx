@@ -1,4 +1,15 @@
-import { Upload, Modal, Spin, Row, Col, Card, Form, Input, Button } from "antd";
+import {
+  Upload,
+  Modal,
+  Spin,
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  Button,
+  message,
+} from "antd";
 import {
   LoadingOutlined,
   PlusOutlined,
@@ -7,13 +18,19 @@ import {
 } from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import { useMediaLibraries } from "../../hooks/media";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import TextArea from "antd/lib/input/TextArea";
 import ButtonGroup from "antd/lib/button/button-group";
 
 function FileList() {
-  const { data: listsFile, onAdd, onDelete, loading } = useMediaLibraries();
+  const {
+    data: listsFile,
+    onAdd,
+    onDelete,
+    onUpdate,
+    loading,
+  } = useMediaLibraries();
   const listFile = listsFile?.data?.data;
   const [preview, setPreview] = useState(false);
   const [previewItem, setPreviewItem] = useState("");
@@ -24,8 +41,12 @@ function FileList() {
       name: item.filename,
       type: item.mimetype,
       url: item.url,
+      title: item.title,
+      altText: item.alt_text,
+      desc: item.description,
     };
   });
+  const [form] = Form.useForm();
 
   const onPreview = async (file) => {
     setPreviewItem(file.url);
@@ -36,20 +57,34 @@ function FileList() {
     setPreview(false);
   };
 
-  const onRemove = async (file) => {
-    onDelete(file.id, file.url);
+  const handleRemove = (file) => {
+    onDelete(file.uid, file.url);
+    setImageDetail("");
   };
 
   const handleSelect = (file) => {
+    form.resetFields();
     setImageDetail(file);
-    console.log("selected");
+  };
+
+  useEffect(() => {
+    form.setFieldsValue({
+      title: imageDetail?.title,
+      alt: imageDetail?.altText,
+      description: imageDetail?.desc,
+    });
+  }, [imageDetail]);
+
+  const handleUpdate = (value) => {
+    const data = { ...value, id: imageDetail.uid };
+    onUpdate(data);
   };
 
   return (
     <Spin spinning={loading}>
       {listsFile && (
         <Row gutter={[24, 0]}>
-          <Col span={14}>
+          <Col span={15}>
             <Card title="File List">
               <Upload
                 name="theFiles"
@@ -78,7 +113,7 @@ function FileList() {
               </Upload>
             </Card>
           </Col>
-          <Col span={10}>
+          <Col span={9}>
             <Card title="File Detail">
               <img
                 src={
@@ -86,34 +121,68 @@ function FileList() {
                 }
                 style={{ width: "100%" }}
               />
-              <Form layout="vertical" style={{ marginTop: 30 }}>
-                <Form.Item label="Title">
-                  <Input />
+              <Form
+                layout="vertical"
+                style={{ marginTop: 30 }}
+                onFinish={handleUpdate}
+                form={form}
+              >
+                <Form.Item label="Title" name="title">
+                  <Input disabled={!imageDetail} />
                 </Form.Item>
-                <Form.Item label="Alt Image">
-                  <Input />
+                <Form.Item label="Alt Image" name="alt">
+                  <Input
+                    disabled={!imageDetail}
+                    value={imageDetail && imageDetail.url}
+                  />
                 </Form.Item>
-                <Form.Item label="Description">
-                  <TextArea />
+                <Form.Item label="Description" name="description">
+                  <TextArea disabled={!imageDetail} />
                 </Form.Item>
                 <Form.Item label="URL Image">
                   <Row gutter={[4, 0]}>
-                    <Col span={20}>
-                      <Input disabled />
+                    <Col span={18}>
+                      <Input disabled value={imageDetail && imageDetail.url} />
                     </Col>
                     <Col span={4}>
-                      <Button>Copy URL</Button>
+                      <Button
+                        disabled={!imageDetail}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          try {
+                            // This copy url of file
+                            navigator.clipboard.writeText(
+                              imageDetail && `localhost:3000${imageDetail.url}`
+                            );
+                            message.success("Copied");
+                          } catch (e) {
+                            message.error("Please try again!");
+                          }
+                        }}
+                      >
+                        Copy URL
+                      </Button>
                     </Col>
                   </Row>
                 </Form.Item>
-                <Row justify="end" gutter={[4, 0]} style={{ marginTop: 50 }}>
-                  <Col>
-                    <Button danger>Delete</Button>
-                  </Col>
-                  <Col>
-                    <Button>Update</Button>
-                  </Col>
-                </Row>
+                <Form.Item>
+                  <Row justify="end" gutter={[4, 0]} style={{ marginTop: 20 }}>
+                    <Col>
+                      <Button
+                        danger
+                        onClick={() => imageDetail && handleRemove(imageDetail)}
+                        disabled={!imageDetail}
+                      >
+                        Delete
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button disabled={!imageDetail} htmlType="submit">
+                        Update
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form.Item>
               </Form>
             </Card>
           </Col>

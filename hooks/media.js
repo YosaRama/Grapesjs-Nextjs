@@ -2,6 +2,7 @@ import useSWR, { mutate } from "swr";
 import axios from "axios";
 import { useCallback, useState } from "react";
 import api from "../config/swr";
+import { message } from "antd";
 
 export const useMediaLibraries = () => {
   const pathName = "/media";
@@ -55,10 +56,31 @@ export const useMediaLibraries = () => {
     [pathName]
   );
 
+  const onUpdate = useCallback(
+    async (data) => {
+      try {
+        setLoading(true);
+        const { data: res } = await api.put(pathName, data);
+        if (res) {
+          mutate(pathName);
+          message.success("Success edit data");
+        } else {
+          console.log(error);
+        }
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [pathName]
+  );
+
   return {
     data,
     onAdd,
     onDelete,
+    onUpdate,
     loading: (!error && !data) || loading,
     status,
   };
