@@ -58,7 +58,7 @@ function FileList() {
   };
 
   const handleRemove = (file) => {
-    onDelete(file.uid, file.url);
+    onDelete(file.uid, file.name);
     setImageDetail("");
   };
 

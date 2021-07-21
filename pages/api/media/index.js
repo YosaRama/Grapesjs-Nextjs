@@ -1,6 +1,16 @@
 import nextConnect from "next-connect";
 import { Query } from "../../../db";
 import fs from "fs";
+import aws from "aws-sdk";
+import { file } from "jszip";
+
+aws.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_KEY_ID,
+});
+const bucketName = process.env.S3_BUCKET_NAME;
+
+const s3 = new aws.S3();
 
 const apiRoute = nextConnect({
   onError(error, req, res) {
@@ -24,9 +34,12 @@ apiRoute.get(async (req, res) => {
 
 apiRoute.delete(async (req, res) => {
   const fileId = req.body.id;
-  const fileUrl = "./public/" + req.body.url;
+  const fileUrl = req.body.url;
   try {
-    fs.unlinkSync(fileUrl);
+    s3.deleteObject({ Bucket: bucketName, Key: fileUrl }, (err, data) => {
+      console.log(err);
+      console.log(data);
+    });
     const result = await Query("DELETE FROM media WHERE id=?", [fileId]);
     res.status(200).json({ message: "Success Delete" });
   } catch (error) {
