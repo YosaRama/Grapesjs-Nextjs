@@ -3,11 +3,16 @@ import axios from "axios";
 import { useCallback, useState } from "react";
 import api from "../config/swr";
 import { message } from "antd";
+import { useRouter } from "next/router";
+import serialize from "../config/serialize";
 
 export const useMediaLibraries = () => {
-  const pathName = "/media";
+  const router = useRouter();
+  const queryString = serialize(router.query);
+  const pathName = "/media?";
+  const pathKeys = pathName + queryString;
   const [loading, setLoading] = useState(false);
-  const { data, error } = useSWR(pathName);
+  const { data, error } = useSWR(pathKeys);
   const [status, setStatus] = useState("");
 
   const onAdd = useCallback(

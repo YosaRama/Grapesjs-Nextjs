@@ -1,8 +1,6 @@
 import nextConnect from "next-connect";
 import { Query } from "../../../db";
-import fs from "fs";
 import aws from "aws-sdk";
-import { file } from "jszip";
 
 aws.config.update({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -13,20 +11,29 @@ const bucketName = process.env.S3_BUCKET_NAME;
 const s3 = new aws.S3();
 
 const apiRoute = nextConnect({
-  onError(error, req, res) {
-    res
-      .status(501)
-      .json({ error: `Sorry something Happened! ${error.message}` });
-  },
-  onNoMatch(req, res) {
-    res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
-  },
+  // onError(error, req, res) {
+  //   res
+  //     .status(501)
+  //     .json({ error: `Sorry something Happened! ${error.message}` });
+  // },
+  // onNoMatch(req, res) {
+  //   res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
+  // },
 });
 
 apiRoute.get(async (req, res) => {
   try {
-    const result = await Query("SELECT * FROM media");
-    res.status(200).json({ data: result });
+    const { name } = req.query;
+    const fileName = name + "%";
+    if (name) {
+      const result = await Query("SELECT * FROM media WHERE filename LIKE N?", [
+        fileName,
+      ]);
+      res.status(200).json({ data: result });
+    } else {
+      const result = await Query("SELECT * FROM media");
+      res.status(200).json({ data: result });
+    }
   } catch (error) {
     throw new Error(error.message);
   }
