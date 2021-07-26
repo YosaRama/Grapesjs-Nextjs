@@ -92,7 +92,7 @@ function FileList() {
                 fileList={showFile}
                 // onPreview={onPreview}
                 onRemove={handleSelect}
-                multiple={false}
+                multiple={true} //Change for upload multiple
                 customRequest={onAdd}
                 showUploadList={{
                   showPreviewIcon: false,
