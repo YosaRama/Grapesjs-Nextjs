@@ -11,72 +11,105 @@ export const useMediaLibraries = () => {
   const { data, error } = useSWR(pathName);
   const [status, setStatus] = useState("");
 
+  //* upload with client side
+  // const onAdd = useCallback(
+  //   async ({ file }) => {
+  //     const fmData = new FormData();
+  //     const thumbData = new FormData();
+  //     const config = {
+  //       headers: { "content-type": "multipart/form-data" },
+  //     };
+
+  //     const smallResizeFile = (filePath) =>
+  //       new Promise((resolve) => {
+  //         Resizer.imageFileResizer(
+  //           filePath,
+  //           150,
+  //           50,
+  //           "JPEG",
+  //           100,
+  //           0,
+  //           (uri) => {
+  //             resolve(uri);
+  //           },
+  //           "file"
+  //         );
+  //       });
+
+  //     const mediumResizeFile = (filePath) =>
+  //       new Promise((resolve) => {
+  //         Resizer.imageFileResizer(
+  //           filePath,
+  //           720,
+  //           348,
+  //           "JPEG",
+  //           100,
+  //           0,
+  //           (uri) => {
+  //             resolve(uri);
+  //           },
+  //           "file"
+  //         );
+  //       });
+
+  //     const LargeResizeFile = (filePath) =>
+  //       new Promise((resolve) => {
+  //         Resizer.imageFileResizer(
+  //           filePath,
+  //           1920,
+  //           1200,
+  //           "JPEG",
+  //           100,
+  //           0,
+  //           (uri) => {
+  //             resolve(uri);
+  //             console.log(resolve(uri));
+  //           },
+  //           "file"
+  //         );
+  //       });
+
+  //     if (file.type === "image/jpeg") {
+  //       const smallImage = await smallResizeFile(file);
+  //       const mediumImage = await mediumResizeFile(file);
+  //       const LargeImage = await LargeResizeFile(file);
+
+  //       thumbData.append("theFiles", smallImage, "150px@" + file.name);
+  //       thumbData.append("theFiles", mediumImage, "720px@" + file.name);
+  //       thumbData.append("theFiles", LargeImage, "1920px@" + file.name);
+  //     }
+
+  //     fmData.append("theFiles", file);
+
+  //     try {
+  //       setLoading(true);
+  //       const res = await axios.post("/api/media/upload", fmData, config);
+  //       if (res) {
+  //         const thumbRes = await axios.post(
+  //           "/api/media/upload",
+  //           thumbData,
+  //           config
+  //         );
+  //         mutate(pathName);
+  //         setStatus(res.status);
+  //       } else {
+  //         console.log(error);
+  //       }
+  //     } catch (err) {
+  //       throw new Error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   },
+  //   [pathName]
+  // );
+
   const onAdd = useCallback(
     async ({ file }) => {
       const fmData = new FormData();
-      const thumbData = new FormData();
       const config = {
         headers: { "content-type": "multipart/form-data" },
       };
-
-      const smallResizeFile = (filePath) =>
-        new Promise((resolve) => {
-          Resizer.imageFileResizer(
-            filePath,
-            150,
-            50,
-            "JPEG",
-            100,
-            0,
-            (uri) => {
-              resolve(uri);
-            },
-            "file"
-          );
-        });
-
-      const mediumResizeFile = (filePath) =>
-        new Promise((resolve) => {
-          Resizer.imageFileResizer(
-            filePath,
-            720,
-            348,
-            "JPEG",
-            100,
-            0,
-            (uri) => {
-              resolve(uri);
-            },
-            "file"
-          );
-        });
-
-      const LargeResizeFile = (filePath) =>
-        new Promise((resolve) => {
-          Resizer.imageFileResizer(
-            filePath,
-            1920,
-            1200,
-            "JPEG",
-            100,
-            0,
-            (uri) => {
-              resolve(uri);
-              console.log(resolve(uri));
-            },
-            "file"
-          );
-        });
-
-      if (file.type === "image/jpeg") {
-        const smallImage = await smallResizeFile(file);
-        const mediumImage = await mediumResizeFile(file);
-        const LargeImage = await LargeResizeFile(file);
-
-        thumbData.append("theFiles", smallImage, "150px@" + file.name);
-        thumbData.append("theFiles", mediumImage, "720px@" + file.name);
-        thumbData.append("theFiles", LargeImage, "1920px@" + file.name);
-      }
 
       fmData.append("theFiles", file);
 
@@ -84,11 +117,6 @@ export const useMediaLibraries = () => {
         setLoading(true);
         const res = await axios.post("/api/media/upload", fmData, config);
         if (res) {
-          const thumbRes = await axios.post(
-            "/api/media/upload",
-            thumbData,
-            config
-          );
           mutate(pathName);
           setStatus(res.status);
         } else {
