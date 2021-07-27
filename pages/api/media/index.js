@@ -15,7 +15,9 @@ const apiRoute = nextConnect({
 
 apiRoute.get(async (req, res) => {
   try {
-    const result = await Query("SELECT * FROM media");
+    const result = await Query(
+      "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main'"
+    );
     res.status(200).json({ data: result });
   } catch (error) {
     throw new Error(error.message);
@@ -26,9 +28,29 @@ apiRoute.delete(async (req, res) => {
   const fileId = req.body.id;
   const fileUrl = "./public/" + req.body.url;
   try {
-    fs.unlinkSync(fileUrl);
-    const result = await Query("DELETE FROM media WHERE id=?", [fileId]);
-    res.status(200).json({ message: "Success Delete" });
+    const filesUrl = await Query(
+      "SELECT url FROM media WHERE id=? OR parent_id=?",
+      [fileId, fileId]
+    );
+    try {
+      const fileUrlString = JSON.stringify(filesUrl);
+      const fileUrlArray = JSON.parse(fileUrlString);
+      const unlinkFile = fileUrlArray.map((fileUrl) => {
+        const filePath = "./public/" + fileUrl.url;
+        fs.unlinkSync(filePath);
+      });
+      if (unlinkFile) {
+        const result = await Query(
+          "DELETE FROM media WHERE id=? OR parent_id=?",
+          [fileId, fileId]
+        );
+        res.status(200).json({ message: "Success Delete" });
+      } else {
+        console.log("Unsuccess to unlink file");
+      }
+    } catch (e) {
+      console.log("Error when try unlink");
+    }
   } catch (error) {
     console.log(error);
   }
