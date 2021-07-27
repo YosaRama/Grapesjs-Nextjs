@@ -5,6 +5,7 @@ import api from "../config/swr";
 import { message } from "antd";
 import { useRouter } from "next/router";
 import serialize from "../config/serialize";
+import Resizer from "react-image-file-resizer";
 
 export const useMediaLibraries = () => {
   const router = useRouter();
@@ -18,14 +19,80 @@ export const useMediaLibraries = () => {
   const onAdd = useCallback(
     async ({ file }) => {
       const fmData = new FormData();
+      const thumbData = new FormData();
       const config = {
         headers: { "content-type": "multipart/form-data" },
       };
+
+      const smallResizeFile = (filePath) =>
+        new Promise((resolve) => {
+          Resizer.imageFileResizer(
+            filePath,
+            150,
+            50,
+            "JPEG",
+            100,
+            0,
+            (uri) => {
+              resolve(uri);
+            },
+            "file"
+          );
+        });
+
+      const mediumResizeFile = (filePath) =>
+        new Promise((resolve) => {
+          Resizer.imageFileResizer(
+            filePath,
+            720,
+            348,
+            "JPEG",
+            100,
+            0,
+            (uri) => {
+              resolve(uri);
+            },
+            "file"
+          );
+        });
+
+      const LargeResizeFile = (filePath) =>
+        new Promise((resolve) => {
+          Resizer.imageFileResizer(
+            filePath,
+            1920,
+            1200,
+            "JPEG",
+            100,
+            0,
+            (uri) => {
+              resolve(uri);
+              console.log(resolve(uri));
+            },
+            "file"
+          );
+        });
+
+      if (file.type === "image/jpeg") {
+        const smallImage = await smallResizeFile(file);
+        const mediumImage = await mediumResizeFile(file);
+        const LargeImage = await LargeResizeFile(file);
+
+        thumbData.append("theFiles", smallImage, "150px@" + file.name);
+        thumbData.append("theFiles", mediumImage, "720px@" + file.name);
+        thumbData.append("theFiles", LargeImage, "1920px@" + file.name);
+      }
+
       fmData.append("theFiles", file);
       try {
         setLoading(true);
         const res = await axios.post("/api/media/upload", fmData, config);
         if (res) {
+          const thumbRes = await axios.post(
+            "/api/media/upload",
+            thumbData,
+            config
+          );
           mutate(pathName);
           setStatus(res.status);
         } else {
@@ -43,7 +110,7 @@ export const useMediaLibraries = () => {
   const onDelete = useCallback(
     async (Id, Url) => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const { data: res } = await api.delete(pathName, {
           data: { id: Id, url: Url },
         });

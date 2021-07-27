@@ -26,12 +26,15 @@ apiRoute.get(async (req, res) => {
     const { name } = req.query;
     const fileName = name + "%";
     if (name) {
-      const result = await Query("SELECT * FROM media WHERE filename LIKE N?", [
-        fileName,
-      ]);
+      const result = await Query(
+        "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main' AND filename LIKE N?",
+        [fileName]
+      );
       res.status(200).json({ data: result });
     } else {
-      const result = await Query("SELECT * FROM media");
+      const result = await Query(
+        "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main'"
+      );
       res.status(200).json({ data: result });
     }
   } catch (error) {
@@ -43,12 +46,32 @@ apiRoute.delete(async (req, res) => {
   const fileId = req.body.id;
   const fileUrl = req.body.url;
   try {
-    s3.deleteObject({ Bucket: bucketName, Key: fileUrl }, (err, data) => {
-      console.log(err);
-      console.log(data);
-    });
-    const result = await Query("DELETE FROM media WHERE id=?", [fileId]);
-    res.status(200).json({ message: "Success Delete" });
+    const filesUrl = await Query(
+      "SELECT filename FROM media WHERE id=? OR parent_id=?",
+      [fileId, fileId]
+    );
+    try {
+      const fileUrlString = JSON.stringify(filesUrl);
+      const fileUrlArray = JSON.parse(fileUrlString);
+      const unlinkFile = fileUrlArray.map((fileUrl) => {
+        const filePath = fileUrl.filename;
+        s3.deleteObject({ Bucket: bucketName, Key: filePath }, (err, data) => {
+          console.log(err);
+          console.log(data);
+        });
+      });
+      if (unlinkFile) {
+        const result = await Query(
+          "DELETE FROM media WHERE id=? OR parent_id=?",
+          [fileId, fileId]
+        );
+        res.status(200).json({ message: "Success Delete" });
+      } else {
+        console.log("Unsuccess to unlink file");
+      }
+    } catch (e) {
+      console.log("Error when try unlink");
+    }
   } catch (error) {
     console.log(error);
   }

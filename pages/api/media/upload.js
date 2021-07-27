@@ -49,15 +49,48 @@ var upload = multer({
 
 const apiRoute = nextConnect();
 
-apiRoute.post(upload.single("theFiles"), async (req, res) => {
-  const fileName = req.file.originalname;
-  const fileType = req.file.mimetype;
-  const filePath = req.file.location;
+apiRoute.post(upload.array("theFiles"), async (req, res) => {
+  const files = await req.files;
+
   try {
-    const result = await Query(
-      "INSERT INTO media (filename, mimetype, url) VALUES (?,?,?)",
-      [fileName, fileType, filePath]
-    );
+    files.map(async (file) => {
+      const fileName = file.originalname;
+      const fileType = file.mimetype;
+      const filePath = file.location;
+      const queryName = fileName.split("@");
+      let dimension = "main";
+      if (queryName[0] === "150px") {
+        dimension = "small";
+      }
+      if (queryName[0] === "720px") {
+        dimension = "medium";
+      }
+      if (queryName[0] === "1920px") {
+        dimension = "large";
+      }
+
+      if (
+        queryName[0] !== "150px" &&
+        queryName[0] !== "720px" &&
+        queryName[0] !== "1920px"
+      ) {
+        const result = await Query(
+          "INSERT INTO media (dimension, filename, mimetype, url) VALUES (?,?,?,?)",
+          [dimension, fileName, fileType, filePath]
+        );
+      } else {
+        const parentId = await Query("SELECT id FROM media WHERE filename=?", [
+          queryName[1],
+        ]);
+        const currentId = await parentId[0]?.id;
+
+        const result = await Query(
+          "INSERT INTO media (parent_id, dimension, filename, mimetype, url) VALUES (?,?,?,?,?)",
+          [currentId, dimension, fileName, fileType, filePath]
+        );
+      }
+    });
+
     res.status(200).json({ data: "Success save file" });
   } catch (error) {
     throw new Error(error);

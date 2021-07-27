@@ -40,7 +40,8 @@ function FileList() {
       uid: item.id,
       name: item.filename,
       type: item.mimetype,
-      url: item.url,
+      originalUrl: item.url,
+      url: item.thumb_url,
       title: item.title,
       altText: item.alt_text,
       desc: item.description,
@@ -132,7 +133,7 @@ function FileList() {
                   listType="picture-card"
                   fileList={showFile}
                   onRemove={handleSelect}
-                  multiple={false}
+                  multiple={true}
                   customRequest={onAdd}
                   showUploadList={{
                     showPreviewIcon: false,
@@ -176,7 +177,7 @@ function FileList() {
               <Form.Item label="Alt Image" name="alt">
                 <Input
                   disabled={!imageDetail}
-                  value={imageDetail && imageDetail.url}
+                  value={imageDetail && imageDetail.originalUrl}
                 />
               </Form.Item>
               <Form.Item label="Description" name="description">
@@ -185,7 +186,10 @@ function FileList() {
               <Form.Item label="URL Image">
                 <Row gutter={[4, 0]}>
                   <Col span={18}>
-                    <Input disabled value={imageDetail && imageDetail.url} />
+                    <Input
+                      disabled
+                      value={imageDetail && imageDetail.originalUrl}
+                    />
                   </Col>
                   <Col span={4}>
                     <Button
@@ -195,7 +199,8 @@ function FileList() {
                         try {
                           // This copy url of file
                           navigator.clipboard.writeText(
-                            imageDetail && `localhost:3000${imageDetail.url}`
+                            imageDetail &&
+                              `localhost:3000${imageDetail.originalUrl}`
                           );
                           message.success("Copied");
                         } catch (e) {
