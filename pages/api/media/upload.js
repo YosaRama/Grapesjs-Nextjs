@@ -1,6 +1,7 @@
 import nextConnect from "next-connect";
 import multer from "multer";
 import multerS3 from "multer-s3";
+import multerSharp from "multer-sharp-s3";
 import aws from "aws-sdk";
 import fs from "fs";
 import { Query } from "../../../db";
@@ -14,26 +15,24 @@ const bucketName = process.env.S3_BUCKET_NAME;
 
 const s3 = new aws.S3();
 
-var upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: bucketName,
-    acl: "public-read",
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    key: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  }),
+const storage = multerSharp({
+  Key: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+  s3,
+  Bucket: bucketName,
+  multiple: true,
+  resize: [
+    { suffix: "@1920px", width: 1920 },
+    { suffix: "@720px", width: 720 },
+    { suffix: "@150px", width: 150 },
+    { suffix: "original" },
+  ],
 });
 
-// * Upload to local storage
-// const upload = multer({
-//   storage: multer.diskStorage({
-//     destination: "./public/images",
-//     filename: (req, file, cb) =>
-//       cb(null, file.originalname.split(" ").join("_")),
-//   }),
-// });
+var upload = multer({
+  storage: storage,
+});
 
 //* Error handling for API system
 // const apiRoute = nextConnect({
@@ -49,51 +48,88 @@ var upload = multer({
 
 const apiRoute = nextConnect();
 
-apiRoute.post(upload.array("theFiles"), async (req, res) => {
-  const files = await req.files;
+apiRoute.post(upload.single("theFiles"), async (req, res) => {
+  const file = req?.file;
+  const originalName = file?.original?.Key || file?.originalname;
+  const originalPath = file?.original?.Location || file?.Location;
+  const fileType = file?.mimetype;
+  const largeFile = file["@1920px"];
+  const mediumFile = file["@720px"];
+  const smallFile = file["@150px"];
 
   try {
-    files.map(async (file) => {
-      const fileName = file.originalname;
-      const fileType = file.mimetype;
-      const filePath = file.location;
-      const queryName = fileName.split("@");
-      let dimension = "main";
-      if (queryName[0] === "150px") {
-        dimension = "small";
-      }
-      if (queryName[0] === "720px") {
-        dimension = "medium";
-      }
-      if (queryName[0] === "1920px") {
-        dimension = "large";
-      }
-
-      if (
-        queryName[0] !== "150px" &&
-        queryName[0] !== "720px" &&
-        queryName[0] !== "1920px"
-      ) {
-        const result = await Query(
-          "INSERT INTO media (dimension, filename, mimetype, url) VALUES (?,?,?,?)",
-          [dimension, fileName, fileType, filePath]
-        );
-      } else {
+    const result = await Query(
+      "INSERT INTO media (type, dimension, filename, mimetype, url) VALUES (?,?,?,?,?)",
+      ["media", "main", originalName, fileType, originalPath]
+    );
+    if (result && fileType === "image/jpeg") {
+      try {
         const parentId = await Query("SELECT id FROM media WHERE filename=?", [
-          queryName[1],
+          originalName,
         ]);
         const currentId = await parentId[0]?.id;
 
-        const result = await Query(
-          "INSERT INTO media (parent_id, dimension, filename, mimetype, url) VALUES (?,?,?,?,?)",
-          [currentId, dimension, fileName, fileType, filePath]
-        );
-      }
-    });
+        // Large image detail
+        const largeThumbName = largeFile.Key;
+        const largeThumbUrl = largeFile.Location;
 
-    res.status(200).json({ data: "Success save file" });
-  } catch (error) {
-    throw new Error(error);
+        const largeSize = await Query(
+          "INSERT INTO media (parent_id, type, dimension, filename, mimetype, url) VALUES (?,?,?,?,?,?)",
+          [
+            currentId,
+            "thumbnail",
+            "large",
+            largeThumbName,
+            fileType,
+            largeThumbUrl,
+          ]
+        );
+
+        // Medium image detail
+        const mediumThumbName = mediumFile.Key;
+        const mediumThumbUrl = mediumFile.Location;
+
+        const mediumSize = await Query(
+          "INSERT INTO media (parent_id, type, dimension, filename, mimetype, url) VALUES (?,?,?,?,?,?)",
+          [
+            currentId,
+            "thumbnail",
+            "medium",
+            mediumThumbName,
+            fileType,
+            mediumThumbUrl,
+          ]
+        );
+
+        // Small image detail
+        const smallThumbName = smallFile.Key;
+        const smallThumbUrl = smallFile.Location;
+
+        const smallSize = await Query(
+          "INSERT INTO media (parent_id, type, dimension, filename, mimetype, url) VALUES (?,?,?,?,?,?)",
+          [
+            currentId,
+            "thumbnail",
+            "small",
+            smallThumbName,
+            fileType,
+            smallThumbUrl,
+          ]
+        );
+
+        if (smallSize && mediumSize && largeSize) {
+          res.status(200).send({ message: "All image serve!" });
+        } else {
+          res.status(200).send({ message: "Error both of file!" });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      res.status(200).send({ message: "File success to save" });
+    }
+  } catch (err) {
+    console.log(err);
   }
 });
 
