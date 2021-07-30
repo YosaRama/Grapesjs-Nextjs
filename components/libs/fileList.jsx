@@ -97,7 +97,12 @@ function FileList() {
                   removeIcon: (
                     <button
                       title="View Details"
-                      style={{ width: "100%", padding: 0 }}
+                      style={{
+                        width: "100%",
+                        padding: 0,
+                        background: "none",
+                        border: "none",
+                      }}
                     >
                       <EyeOutlined style={{ margin: 0 }} />
                     </button>
