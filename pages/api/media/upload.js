@@ -50,6 +50,10 @@ apiRoute.post(upload.single("theFiles"), async (req, res) => {
   const file = req?.file;
   const originalName = file?.original?.Key || file?.originalname;
   const originalPath = file?.original?.Location || file?.Location;
+  const originalSize =
+    Math.round(file?.original?.size / 1000) || Math.round(file?.size / 1000);
+  const originalWidth = file?.original?.width;
+  const originalHeight = file?.original?.height;
   const fileType = file?.mimetype;
   const largeFile = file["@1920px"];
   const mediumFile = file["@720px"];
@@ -57,8 +61,18 @@ apiRoute.post(upload.single("theFiles"), async (req, res) => {
 
   try {
     const result = await Query(
-      "INSERT INTO media (type, dimension, filename, mimetype, url) VALUES (?,?,?,?,?)",
-      ["media", "main", originalName, fileType, originalPath]
+      "INSERT INTO media (type, dimension, filename, mimetype, url, uploaded_by, size, width, height) VALUES (?,?,?,?,?,?,?,?,?)",
+      [
+        "media",
+        "main",
+        originalName,
+        fileType,
+        originalPath,
+        1,
+        originalSize,
+        originalWidth,
+        originalHeight,
+      ]
     );
     if (result && fileType === "image/jpeg") {
       try {

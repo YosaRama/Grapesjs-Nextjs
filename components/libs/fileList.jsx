@@ -9,6 +9,7 @@ import {
   Input,
   Button,
   message,
+  Descriptions,
 } from "antd";
 import {
   LoadingOutlined,
@@ -38,14 +39,18 @@ function FileList() {
   const [imageDetail, setImageDetail] = useState(null);
   const showFile = listFile?.map((item) => {
     return {
-      uid: item.id,
-      name: item.filename,
-      type: item.mimetype,
-      originalUrl: item.url,
-      url: item.thumb_url,
-      title: item.title,
-      altText: item.alt_text,
-      desc: item.description,
+      uid: item?.id,
+      name: item?.filename,
+      type: item?.mimetype,
+      originalUrl: item?.url,
+      url: item?.thumb_url,
+      title: item?.title,
+      altText: item?.alt_text,
+      desc: item?.description,
+      uploadedOn: item?.created_at,
+      uploadedBy: "admin",
+      size: item?.size,
+      dimension: item?.width + " by " + item?.height + " pixels ",
     };
   });
 
@@ -173,15 +178,76 @@ function FileList() {
               src={imageDetail ? imageDetail.url : "/images/default-image.png"}
               style={{ width: "100%" }}
             />
+            {imageDetail && (
+              <Descriptions style={{ margin: "20px 0px" }}>
+                {imageDetail?.uploadedOn && (
+                  <Descriptions.Item
+                    label="Uploaded on"
+                    labelStyle={{ fontWeight: "bold" }}
+                    span={3}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {new Date(imageDetail?.uploadedOn).toLocaleDateString()}
+                  </Descriptions.Item>
+                )}
+                {imageDetail?.uploadedBy && (
+                  <Descriptions.Item
+                    label="Uploaded by"
+                    labelStyle={{ fontWeight: "bold" }}
+                    span={3}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {imageDetail?.uploadedBy}
+                  </Descriptions.Item>
+                )}
+                {imageDetail?.name && (
+                  <Descriptions.Item
+                    label="File name"
+                    labelStyle={{ fontWeight: "bold" }}
+                    span={3}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {imageDetail?.name}
+                  </Descriptions.Item>
+                )}
+                {imageDetail?.type && (
+                  <Descriptions.Item
+                    label="File type"
+                    labelStyle={{ fontWeight: "bold" }}
+                    span={3}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {imageDetail?.type}
+                  </Descriptions.Item>
+                )}
+                {imageDetail?.size && (
+                  <Descriptions.Item
+                    label="File size"
+                    labelStyle={{ fontWeight: "bold" }}
+                    span={3}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {imageDetail?.size + " KB"}
+                  </Descriptions.Item>
+                )}
+                {imageDetail?.size && (
+                  <Descriptions.Item
+                    label="Dimension"
+                    labelStyle={{ fontWeight: "bold" }}
+                    span={3}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {imageDetail?.dimension}
+                  </Descriptions.Item>
+                )}
+              </Descriptions>
+            )}
             <Form
               layout="vertical"
               style={{ marginTop: 30 }}
               onFinish={handleUpdate}
               form={form}
             >
-              <Form.Item label="File Name" name="file_name">
-                <Input disabled />
-              </Form.Item>
               <Form.Item label="Title" name="title">
                 <Input disabled={!imageDetail} />
               </Form.Item>
