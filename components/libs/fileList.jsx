@@ -15,6 +15,7 @@ import {
   PlusOutlined,
   CheckOutlined,
   StarOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 // import ImgCrop from "antd-img-crop";
 import { useMediaLibraries } from "../../hooks/media";
@@ -136,7 +137,19 @@ function FileList() {
                   showUploadList={{
                     showPreviewIcon: false,
                     showRemoveIcon: true,
-                    removeIcon: <CheckOutlined />,
+                    removeIcon: (
+                      <button
+                        title="View Details"
+                        style={{
+                          width: "100%",
+                          padding: 0,
+                          background: "none",
+                          border: "none",
+                        }}
+                      >
+                        <EyeOutlined style={{ margin: 0 }} />
+                      </button>
+                    ),
                   }}
                 >
                   {
