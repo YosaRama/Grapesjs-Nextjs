@@ -1,9 +1,7 @@
 import nextConnect from "next-connect";
 import multer from "multer";
-import multerS3 from "multer-s3";
 import multerSharp from "multer-sharp-s3";
 import aws from "aws-sdk";
-import fs from "fs";
 import { Query } from "../../../db";
 
 // * Upload to S3

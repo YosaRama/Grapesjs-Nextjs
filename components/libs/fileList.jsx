@@ -91,7 +91,7 @@ function FileList() {
   };
 
   const handlePreview = (file) => {
-    window.open(file.url);
+    window.open(file.originalUrl);
   };
 
   const handleSearch = (value) => {
@@ -119,9 +119,7 @@ function FileList() {
                       style={{ width: 200 }}
                     />
                   </Form.Item>
-                  <Button danger onClick={handleClear}>
-                    Clear
-                  </Button>
+                  <Button onClick={handleClear}>Clear</Button>
                 </Row>
               </Form>
             }

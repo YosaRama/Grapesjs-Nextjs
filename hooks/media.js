@@ -5,7 +5,6 @@ import api from "../config/swr";
 import { message } from "antd";
 import { useRouter } from "next/router";
 import serialize from "../config/serialize";
-import Resizer from "react-image-file-resizer";
 
 export const useMediaLibraries = () => {
   const router = useRouter();

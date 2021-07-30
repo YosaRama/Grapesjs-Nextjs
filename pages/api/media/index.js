@@ -24,10 +24,10 @@ const apiRoute = nextConnect({
 apiRoute.get(async (req, res) => {
   try {
     const { name } = req.query;
-    const fileName = name + "%";
+    const fileName = "%" + name + "%";
     if (name) {
       const result = await Query(
-        "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main' AND filename LIKE N?",
+        "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main' AND filename LIKE ?",
         [fileName]
       );
       res.status(200).json({ data: result });
