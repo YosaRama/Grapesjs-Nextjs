@@ -9,13 +9,9 @@ import {
   Input,
   Button,
   message,
+  Tooltip,
 } from "antd";
-import {
-  LoadingOutlined,
-  PlusOutlined,
-  CheckOutlined,
-  StarOutlined,
-} from "@ant-design/icons";
+import { LoadingOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import { useMediaLibraries } from "../../hooks/media";
 import { useCallback, useEffect, useState } from "react";
@@ -91,14 +87,21 @@ function FileList() {
                 name="theFiles"
                 listType="picture-card"
                 fileList={showFile}
-                // onPreview={onPreview}
+                //Remove button is Preview button
                 onRemove={handleSelect}
                 multiple={false} //Change for upload multiple
                 customRequest={onAdd}
                 showUploadList={{
                   showPreviewIcon: false,
                   showRemoveIcon: true,
-                  removeIcon: <CheckOutlined />,
+                  removeIcon: (
+                    <button
+                      title="View Details"
+                      style={{ width: "100%", padding: 0 }}
+                    >
+                      <EyeOutlined style={{ margin: 0 }} />
+                    </button>
+                  ),
                 }}
               >
                 {
