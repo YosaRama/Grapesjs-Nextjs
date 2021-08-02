@@ -23,7 +23,8 @@ const apiRoute = nextConnect({
 
 apiRoute.get(async (req, res) => {
   try {
-    const { name } = req.query;
+    const { name, page } = req.query;
+    const limit = +page * 25;
     const fileName = "%" + name + "%";
     if (name) {
       const result = await Query(
@@ -33,7 +34,8 @@ apiRoute.get(async (req, res) => {
       res.status(200).json({ data: result });
     } else {
       const result = await Query(
-        "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main'"
+        "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main' ORDER BY created_at DESC LIMIT 25 OFFSET ?",
+        [limit]
       );
       res.status(200).json({ data: result });
     }
@@ -65,7 +67,9 @@ apiRoute.delete(async (req, res) => {
           "DELETE FROM media WHERE id=? OR parent_id=?",
           [fileId, fileId]
         );
-        res.status(200).json({ message: "Success Delete" });
+        if (result) {
+          res.status(200).json({ message: "Success Delete" });
+        }
       } else {
         console.log("Unsuccess to unlink file");
       }

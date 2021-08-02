@@ -7,7 +7,7 @@ import { MediaContextProvider } from "../store/mediaContext";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <SWRConfig value={{ refreshInterval: 3000, fetcher }}>
+    <SWRConfig value={{ refreshInterval: 0, fetcher }}>
       <BuilderContextProvider>
         <MediaContextProvider>
           <Component {...pageProps} />

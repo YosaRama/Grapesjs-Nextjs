@@ -20,30 +20,44 @@ import {
 } from "@ant-design/icons";
 // import ImgCrop from "antd-img-crop";
 import { useMediaLibraries } from "../../hooks/media";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import TextArea from "antd/lib/input/TextArea";
 import { useRouter } from "next/router";
 
 function FileList() {
+  const mediaRef = useRef();
+  const [scrollLayer, setScrollLayer] = useState(200);
+  const [pagination, setPagination] = useState(0);
+
   // Custom Hooks
   const {
     data: listsFile,
     onAdd,
     onDelete,
     onUpdate,
+    setSize,
+    size,
     loading,
+    status,
+    progress,
   } = useMediaLibraries();
-  const listFile = listsFile?.data?.data;
+
   const [preview, setPreview] = useState(false);
   const [previewItem, setPreviewItem] = useState("");
   const [imageDetail, setImageDetail] = useState(null);
-  const showFile = listFile?.map((item) => {
+
+  const listFile = listsFile?.map((files) => {
+    const filesLoad = files?.data?.data;
+    return filesLoad;
+  });
+  const loadFiles = listFile?.flat(1);
+  const showFile = loadFiles?.map((item) => {
     return {
       uid: item?.id,
       name: item?.filename,
       type: item?.mimetype,
       originalUrl: item?.url,
-      url: item?.thumb_url,
+      url: item?.thumb_url || item?.url,
       title: item?.title,
       altText: item?.alt_text,
       desc: item?.description,
@@ -109,11 +123,21 @@ function FileList() {
     router.push(`/dashboard/media`);
   };
 
+  const handleScroll = () => {
+    const currentTop = mediaRef.current.scrollTop;
+    if (currentTop > scrollLayer) {
+      setPagination(pagination + 25);
+      setScrollLayer(scrollLayer + 200);
+      setSize(size + 1);
+    }
+  };
+
   return (
     <>
       <Row gutter={[24, 0]}>
         <Col span={15}>
           <Card
+            className="media-upload-card"
             title="File List"
             extra={
               <Form form={formSearch}>
@@ -130,46 +154,54 @@ function FileList() {
               </Form>
             }
           >
-            <Spin spinning={loading}>
-              {listsFile && (
-                <Upload
-                  name="theFiles"
-                  listType="picture-card"
-                  fileList={showFile}
-                  onRemove={handleSelect}
-                  multiple={true}
-                  customRequest={onAdd}
-                  showUploadList={{
-                    showPreviewIcon: false,
-                    showRemoveIcon: true,
-                    removeIcon: (
-                      <button
-                        title="View Details"
-                        style={{
-                          width: "100%",
-                          padding: 0,
-                          background: "none",
-                          border: "none",
-                        }}
-                      >
-                        <EyeOutlined style={{ margin: 0 }} />
-                      </button>
-                    ),
-                  }}
-                >
-                  {
-                    <div>
-                      {loading ? (
-                        <LoadingOutlined style={{ fontSize: 24 }} />
-                      ) : (
-                        <PlusOutlined style={{ fontSize: 24 }} />
-                      )}
-                      <div className="ant-upload-text">Upload</div>
-                    </div>
-                  }
-                </Upload>
-              )}
-            </Spin>
+            <div
+              style={{ height: "500px", overflow: "auto", padding: "25px" }}
+              onScroll={handleScroll}
+              ref={mediaRef}
+            >
+              <Spin spinning={loading}>
+                {listsFile && (
+                  <Upload
+                    progress={true}
+                    name="theFiles"
+                    listType="picture-card"
+                    fileList={showFile}
+                    onRemove={handleSelect}
+                    multiple={true}
+                    customRequest={onAdd}
+                    onDrop={onAdd}
+                    showUploadList={{
+                      showPreviewIcon: false,
+                      showRemoveIcon: true,
+                      removeIcon: (
+                        <button
+                          title="View Details"
+                          style={{
+                            width: "100%",
+                            padding: 0,
+                            background: "none",
+                            border: "none",
+                          }}
+                        >
+                          <EyeOutlined style={{ margin: 0 }} />
+                        </button>
+                      ),
+                    }}
+                  >
+                    {
+                      <div>
+                        {loading ? (
+                          <LoadingOutlined style={{ fontSize: 24 }} />
+                        ) : (
+                          <PlusOutlined style={{ fontSize: 24 }} />
+                        )}
+                        <div className="ant-upload-text">Upload</div>
+                      </div>
+                    }
+                  </Upload>
+                )}
+              </Spin>
+            </div>
           </Card>
         </Col>
         <Col span={9}>
@@ -320,9 +352,6 @@ function FileList() {
           </Card>
         </Col>
       </Row>
-      <Modal visible={preview} footer={null} onCancel={handleCancel}>
-        <img alt="example" style={{ width: "100%" }} src={previewItem} />
-      </Modal>
     </>
   );
 }

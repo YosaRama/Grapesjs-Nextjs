@@ -1,4 +1,4 @@
-import useSWR, { mutate } from "swr";
+import { useSWRInfinite } from "swr";
 import axios from "axios";
 import { useCallback, useState } from "react";
 import api from "../config/swr";
@@ -12,8 +12,11 @@ export const useMediaLibraries = () => {
   const pathName = "/media?";
   const pathKeys = pathName + queryString;
   const [loading, setLoading] = useState(false);
-  const { data, error } = useSWR(pathKeys);
   const [status, setStatus] = useState("");
+
+  const { data, size, setSize, error, isValidating, mutate } = useSWRInfinite(
+    (index) => pathKeys + `&page=${index}`
+  );
 
   const onAdd = useCallback(
     async ({ file }) => {
@@ -27,7 +30,7 @@ export const useMediaLibraries = () => {
         setLoading(true);
         const res = await axios.post("/api/media/upload", fmData, config);
         if (res) {
-          mutate(pathName);
+          mutate();
           setStatus(res.status);
         } else {
           console.log(error);
@@ -49,7 +52,7 @@ export const useMediaLibraries = () => {
           data: { id: Id, url: Url },
         });
         if (res) {
-          mutate(pathName);
+          mutate();
         } else {
           console.log(error);
         }
@@ -68,7 +71,7 @@ export const useMediaLibraries = () => {
         setLoading(true);
         const { data: res } = await api.put(pathName, data);
         if (res) {
-          mutate(pathName);
+          mutate();
           message.success("Success edit data");
         } else {
           console.log(error);

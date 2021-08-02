@@ -59,3 +59,16 @@ a {
   color: #fff;
   font-size: 24px;
 }
+
+.media-upload-card .ant-card-body {
+  padding: 0;
+}
+
+.ant-upload-list-picture-card {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ant-upload-select-picture-card {
+  order: -1;
+}
