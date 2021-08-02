@@ -92,5 +92,7 @@ export const useMediaLibraries = () => {
     onUpdate,
     loading: (!error && !data) || loading,
     status,
+    setSize,
+    size,
   };
 };
