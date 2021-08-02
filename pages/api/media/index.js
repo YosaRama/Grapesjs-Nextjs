@@ -3,20 +3,22 @@ import { Query } from "../../../db";
 import fs from "fs";
 
 const apiRoute = nextConnect({
-  onError(error, req, res) {
-    res
-      .status(501)
-      .json({ error: `Sorry something Happened! ${error.message}` });
-  },
-  onNoMatch(req, res) {
-    res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
-  },
+  // onError(error, req, res) {
+  //   res
+  //     .status(501)
+  //     .json({ error: `Sorry something Happened! ${error.message}` });
+  // },
+  // onNoMatch(req, res) {
+  //   res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
+  // },
 });
 
 apiRoute.get(async (req, res) => {
+  const limit = +req?.query?.page * 25;
   try {
     const result = await Query(
-      "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main'"
+      "SELECT a.*, (SELECT b.url FROM media AS b WHERE b.dimension='medium' AND b.parent_id = a.id) AS thumb_url FROM media AS a WHERE dimension='main' ORDER BY created_at DESC LIMIT 25 OFFSET ?",
+      [limit]
     );
     res.status(200).json({ data: result });
   } catch (error) {
@@ -44,7 +46,9 @@ apiRoute.delete(async (req, res) => {
           "DELETE FROM media WHERE id=? OR parent_id=?",
           [fileId, fileId]
         );
-        res.status(200).json({ message: "Success Delete" });
+        if (result) {
+          res.status(200).json({ message: "Success Delete" });
+        }
       } else {
         console.log("Unsuccess to unlink file");
       }

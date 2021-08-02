@@ -145,6 +145,9 @@ apiRoute.post(upload.single("theFiles"), async (req, res) => {
                   "INSERT INTO media (parent_id, dimension, filename, mimetype, url) VALUES (?,?,?,?,?)",
                   [currentId, "medium", fileName, fileType, thumbUrl]
                 );
+                if (result) {
+                  res.status(200).send({ message: "Success upload file" });
+                }
               } catch (e) {
                 console.log(e);
               }
@@ -180,8 +183,6 @@ apiRoute.post(upload.single("theFiles"), async (req, res) => {
   } catch (e) {
     console.log(e);
   }
-
-  res.redirect("/");
 });
 
 export default apiRoute;

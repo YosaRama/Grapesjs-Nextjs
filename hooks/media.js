@@ -1,15 +1,18 @@
-import useSWR, { mutate } from "swr";
+import { useSWRInfinite } from "swr";
 import axios from "axios";
 import { useCallback, useState } from "react";
-import api from "../config/swr";
+import api, { fetcher } from "../config/swr";
 import { message } from "antd";
-import Resizer from "react-image-file-resizer";
 
 export const useMediaLibraries = () => {
-  const pathName = "/media";
+  const pathName = "/media?";
   const [loading, setLoading] = useState(false);
-  const { data, error } = useSWR(pathName);
   const [status, setStatus] = useState("");
+  const [progress, setProgress] = useState(0);
+
+  const { data, size, setSize, error, isValidating, mutate } = useSWRInfinite(
+    (index) => `/media?page=${index}`
+  );
 
   //* upload with client side
   // const onAdd = useCallback(
@@ -104,32 +107,26 @@ export const useMediaLibraries = () => {
   //   [pathName]
   // );
 
-  const onAdd = useCallback(
-    async ({ file }) => {
-      const fmData = new FormData();
-      const config = {
-        headers: { "content-type": "multipart/form-data" },
-      };
-
-      fmData.append("theFiles", file);
-
-      try {
-        setLoading(true);
-        const res = await axios.post("/api/media/upload", fmData, config);
-        if (res) {
-          mutate(pathName);
-          setStatus(res.status);
-        } else {
-          console.log(error);
-        }
-      } catch (err) {
-        throw new Error(err);
-      } finally {
-        setLoading(false);
+  const onAdd = useCallback(async ({ file }) => {
+    const fmData = new FormData();
+    const config = {
+      headers: { "content-type": "multipart/form-data" },
+    };
+    fmData.append("theFiles", file);
+    try {
+      setLoading(true);
+      const res = await axios.post("/api/media/upload", fmData, config);
+      if (res) {
+        mutate();
+      } else {
+        console.log(error);
       }
-    },
-    [pathName]
-  );
+    } catch (err) {
+      throw new Error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const onDelete = useCallback(
     async (Id, Url) => {
@@ -139,7 +136,7 @@ export const useMediaLibraries = () => {
           data: { id: Id, url: Url },
         });
         if (res) {
-          mutate(pathName);
+          mutate();
         } else {
           console.log(error);
         }
@@ -154,11 +151,12 @@ export const useMediaLibraries = () => {
 
   const onUpdate = useCallback(
     async (data) => {
+      setStatus("uploading");
       try {
         setLoading(true);
         const { data: res } = await api.put(pathName, data);
         if (res) {
-          mutate(pathName);
+          mutate();
           message.success("Success edit data");
         } else {
           console.log(error);
@@ -167,6 +165,7 @@ export const useMediaLibraries = () => {
         console.log(e);
       } finally {
         setLoading(false);
+        setStatus("done");
       }
     },
     [pathName]
@@ -177,7 +176,10 @@ export const useMediaLibraries = () => {
     onAdd,
     onDelete,
     onUpdate,
-    loading: (!error && !data) || loading,
+    loading: (!error && !data) || loading || isValidating,
     status,
+    progress,
+    size,
+    setSize,
   };
 };
